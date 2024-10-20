@@ -10,9 +10,16 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@radix-ui/react-switch": "^1.1.1",
+    "@translate-tools/core": "^2.0.1",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.452.0",
     "plasmo": "0.89.3",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "tailwind-merge": "^2.5.3",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
@@ -20,12 +27,26 @@
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
     "prettier": "3.2.4",
+    "tailwindcss": "^3.4.13",
     "typescript": "5.3.3"
   },
   "manifest": {
     "host_permissions": [
       "https://*/*"
-    ]
+    ],
+    "permissions": [
+      "storage"
+    ],
+    "icons": {
+      "16": "/src/assets/icon.png",
+      "48": "/src/assets/icon.png",
+      "128": "/src/assets/icon.png"
+    }
+  },
+  "plasmo": {
+    "postcss": true
   }
 }
