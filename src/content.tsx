@@ -175,11 +175,8 @@ export default function App() {
         if (!savedInputElement) return;
         event.preventDefault();
         if (translateText && !applyedCurText) {
-          if (savedInputElement.textContent) {
-            savedInputElement.textContent = translateText;
-          } else {
-            savedInputElement.value = translateText;
-          }
+          savedInputElement.textContent = translateText;
+          savedInputElement.value = translateText;
           setApplyedCurText(true);
         } else {
           hideTranslateBar();
