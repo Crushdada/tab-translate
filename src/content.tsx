@@ -99,7 +99,7 @@ export default function App() {
 
         const target = event.target as HTMLInputElement;
         savedInputElement = target;
-        const text = target.value.trim();
+        const text = target?.value?.trim?.() || target?.textContent?.trim?.();
         if (!text) {
           hideTranslateBar();
           return;
@@ -136,15 +136,35 @@ export default function App() {
 
   const inputHandler = useCallback(
     event => {
+
       if (inputTimeoutRef.current) {
-        clearTimeout(inputTimeoutRef.current );
-        inputTimeoutRef.current =null;
+        clearTimeout(inputTimeoutRef.current);
+        inputTimeoutRef.current = null;
       }
 
-      if (!containsChinese(event.target.value)) return;
-      handleInput(event);
+      // 获取实际文本内容
+      let text = '';
+      const target = event.target;
+
+      if (target.isContentEditable) {
+        text = target.textContent || target.innerText;
+      } else {
+        text = target.value;
+      }
+
+      if (!containsChinese(text)) return;
+
+      const customEvent = {
+        type: 'input',
+        target: target,
+        data: text,
+        bubbles: true,
+        cancelable: true
+      } as InputEvent;
+
+      handleInput(customEvent);
     },
-    [],
+    [handleInput],
   );
 
   let inputHandlerDebounce = useRef(debounce(inputHandler, debounceTimeWhenHideTranslateBar)).current;
@@ -155,7 +175,11 @@ export default function App() {
         if (!savedInputElement) return;
         event.preventDefault();
         if (translateText && !applyedCurText) {
-          savedInputElement.value = translateText;
+          if (savedInputElement.textContent) {
+            savedInputElement.textContent = translateText;
+          } else {
+            savedInputElement.value = translateText;
+          }
           setApplyedCurText(true);
         } else {
           hideTranslateBar();
@@ -175,12 +199,61 @@ export default function App() {
   );
 
   useEffect(() => {
+    // 同时监听 input 事件和 contenteditable 元素的变化
     setInputHandlerDebounceTime(1200);
+    document.addEventListener('input', inputHandlerDebounce);
+
+    // 添加 mutation observer 来监听 contenteditable 元素的变化
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        const target = mutation.target as HTMLElement;
+        // 检查目标元素或其父元素是否是 contenteditable
+        if (target.isContentEditable ||
+            target.parentElement?.isContentEditable) {
+          const editableElement = target.isContentEditable ?
+                                target :
+                                target.parentElement;
+          const event = {
+            target: editableElement,
+            type: 'input'
+          } as Event;
+          inputHandlerDebounce(event);
+        }
+      });
+    });
+
+    // 创建一个函数来观察新的 contenteditable 元素
+    const observeContentEditables = () => {
+      // 断开之前的连接
+      observer.disconnect();
+
+      // 观察整个文档
+      observer.observe(document.body, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['contenteditable']
+      });
+    };
+
+    // 初始观察
+    observeContentEditables();
+
+    // 创建一个 MutationObserver 来监视 DOM 变化，以便观察动态添加的 contenteditable 元素
+    const domObserver = new MutationObserver(observeContentEditables);
+    domObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('input', inputHandlerDebounce);
       document.removeEventListener('keydown', handleKeyDown);
+      observer.disconnect();
+      domObserver.disconnect();
     };
   }, [handleKeyDown, setInputHandlerDebounceTime]);
 
