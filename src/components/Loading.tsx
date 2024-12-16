@@ -11,7 +11,7 @@ export const Loading = ({ size = 1.2, color = '#2150ce' }: ButtonProps) => (
     width={`${size}rem`}
     height={`${size}rem`}
     viewBox="0 0 24 24">
-    <rect width="7.33" height="7.33" x="1" y="1" fill="currentCoslor">
+    <rect width="7.33" height="7.33" x="1" y="1" fill="currentColor">
       <animate
         id="svgSpinnersBlocksWave0"
         attributeName="x"
