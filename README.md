@@ -1,5 +1,7 @@
 This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
 
+问题：需求一般；同时对于一些使用 editable 元素作为输入区域的场景做不到完美适配，故开源出来
+
 ## Getting Started
 
 First, run the development server:
